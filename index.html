@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+    <title>Sentiment Analysis</title>
+</head>
+<body>
+    
+    <div class="container">
+        <h1>Sentiment Analysis (Positive, Negative, Neutral)</h1>
+        <p>Enter your sentence below and click submit...</p>
+    
+    <form class="form">
+        <div class="form-group">
+            <label for="inputs">Sentence:</label>
+            <textarea class = "form-control" rows="5" name="inputs" type="text" placeholder="Please type your sentence here"></textarea>
+        </div>
+            <button type="submit">Submit</button></br>
+    </br>
+            <p id="label"><b>Label</b>: Neutral</p>
+            <p id="score"><b>Score</b>: 0.0</p>
+    </form>
+    </div>
+
+    <script>
+        const formEl = document.querySelector('.form');
+
+        formEl.addEventListener('submit', () => {
+            event.preventDefault();
+
+            const formData = new FormData(formEl);
+            const data = Object.fromEntries(formData);
+
+            fetch('https://1akg7qxs0c.execute-api.us-west-1.amazonaws.com/sentiment-prediction/api-sentiment-prediction', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(data)
+            }).then(res => res.json())
+            .then(data => {
+                var dict = {
+                    "0" : "Negative",
+                    "1" : "Neutral",
+                    "2" : "Positive"
+                }
+
+                var temp = data['body'].split(" ");
+
+                var lbl = document.getElementById('label');
+                lbl.innerHTML = `<b>Label</b>: ${dict[temp[1][0]]}</p>`;
+                
+                var scor = document.getElementById('score');
+                scor.innerHTML = `<b>Score</b>: ${temp[3].slice(0,-1)}</p>`;
+            })
+            .catch(error => console.log(error));
+        });
+    </script>
+</body>
+</html>
